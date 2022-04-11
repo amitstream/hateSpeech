@@ -29,6 +29,12 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 #from tensorflow.keras.callbacks import EarlyStopping
 #from tensorflow.keras.layers import Dense, LSTM, Embedding, Bidirectional
 
+if "model_loaded" not in st.session_state:
+  with open('model.pkl', 'rb') as f:
+    clf2 = pickle.load(f)
+  st.session_state.model_loaded=clf2
+else:
+  clf2=st.session_state.model_loaded
 
 print(datetime.datetime.now(),"Finished import.")
 st.text("Hate Speech Detector")
@@ -47,21 +53,20 @@ tokenizer = Tokenizer()
 # LIB LIB le = LabelEncoder()
 
 print(datetime.datetime.now(),"Program. About to load the model.")
-with open('model.pkl', 'rb') as f:
-    clf2 = pickle.load(f)
 
 print(datetime.datetime.now(),"Program. Finished loading the model.")
-print("*************\nSentence:",sentence)
-sentence = clean(sentence)
-sentence = tokenizer.texts_to_sequences([sentence])
-sentence = pad_sequences(sentence, maxlen=256, truncating='pre')
-p=clf2.predict(sentence)
-print("Prediction:",p)
-a=np.argmax(p)
-print("ArgMax:",a)
-result=labels[a]
-#result = le.inverse_transform(np.argmax(clf2.predict(sentence), axis=-1))[0]
-proba =  np.max(clf2.predict(sentence))
-print(f"{result} : {proba}\n\n")
-st.text(f"{result}")
-print(datetime.datetime.now(),"Program end.")
+if sentence:
+  print("*************\nSentence:",sentence)
+  sentence = clean(sentence)
+  sentence = tokenizer.texts_to_sequences([sentence])
+  sentence = pad_sequences(sentence, maxlen=256, truncating='pre')
+  p=clf2.predict(sentence)
+  print("Prediction:",p)
+  a=np.argmax(p)
+  print("ArgMax:",a)
+  result=labels[a]
+  #result = le.inverse_transform(np.argmax(clf2.predict(sentence), axis=-1))[0]
+  proba =  np.max(clf2.predict(sentence))
+  print(f"{result} : {proba}\n\n")
+  st.text(f"{result}")
+  print(datetime.datetime.now(),"Program end.")
